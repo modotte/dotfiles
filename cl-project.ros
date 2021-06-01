@@ -58,7 +58,7 @@ exec ros -Q -- $0 "$@"
                                 lisp-root-directory
                                 project-name)))
 
-      (unless (null (probe-file* project-path))
+      (when (probe-file* project-path)
         (print-error "Project already exist! Exiting with error")
         (uiop:quit 1))
 
