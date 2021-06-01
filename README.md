@@ -9,9 +9,9 @@ some of these scripts been helpful to you, please consider to *star* this reposi
 ### Common lisp scripts (.ros)
 To run scripts with `.ros` extension, please install [Roswell](https://roswell.github.io/Installation.html).
 The Common Lisp scripts (ended with `.ros` extension) could be invoked with:
-    - `ros exec script.ros`
-    - For faster startup time, you can build the script into (using sbcl) fast execution speed, native machine executable:
-      - `ros build script.ros` and to run `./script`
+- `ros exec script.ros`
+- For faster startup time, you can build the script into (using sbcl) fast execution speed, native machine executable:
+  - `ros build script.ros` and to run `./script`
 
 ### POSIX Bourne shell scripts (.sh)
 Simply run `sh script.sh`
