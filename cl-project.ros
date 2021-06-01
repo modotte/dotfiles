@@ -48,9 +48,14 @@ exec ros -Q -- $0 "$@"
       (format *error-output* "Example: cl-project.ros project-name~%")
       (uiop:quit 1))
 
-    (let ((project-path (format nil
-                                "~A/quicklisp/local-projects/~A"
+    (let* ((lisp-root-directory
+             (if (null (second argv))
+                 ".roswell/local-projects"
+                 (format nil "~A/local-projects" (second argv))))
+           (project-path (format nil
+                                "~A/~A/~A"
                                 +home+
+                                lisp-root-directory
                                 project-name)))
 
       (unless (null (probe-file* project-path))
