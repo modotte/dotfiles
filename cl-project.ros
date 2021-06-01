@@ -33,15 +33,11 @@ exec ros -Q -- $0 "$@"
 (defun print-ok (string)
   (format t
           "~A~%"
-          (concatenate 'string
-                       (green "[OK] ")
-                       string)))
+          (concatenate 'string (green "[OK] ") string)))
 (defun print-error (string)
   (format *error-output*
           "~A~%"
-          (concatenate 'string
-                       (red "[ERROR] ")
-                       string)))
+          (concatenate 'string (red "[ERROR] ")string)))
 
 (defun main (&rest argv)
   (declare (ignorable argv))
@@ -56,7 +52,6 @@ exec ros -Q -- $0 "$@"
                                 "~A/quicklisp/local-projects/~A"
                                 +home+
                                 project-name)))
-
 
       (unless (null (probe-file* project-path))
         (print-error "Project already exist! Exiting with error")
