@@ -37,7 +37,7 @@ exec ros -Q -- $0 "$@"
 (defun print-error (string)
   (format *error-output*
           "~A~%"
-          (concatenate 'string (red "[ERROR] ")string)))
+          (concatenate 'string (red "[ERROR] ") string)))
 
 (defun main (&rest argv)
   (declare (ignorable argv))

@@ -1,0 +1,72 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+;;;;  Copyright (c) 2021, Runecroon
+;;;;  All rights reserved.
+;;;;
+;;;;  This source code is licensed under the BSD-style license found in the
+;;;;  LICENSE file in the root directory of this source tree.
+
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(cl-ansi-text
+                             dexador
+                             yason
+                             clavier)
+                           :silent t))
+
+(defpackage :ros.script.github-user-emails.3831548189
+  (:use :cl)
+  (:import-from :cl-ansi-text
+                :red)
+  (:import-from :yason
+                :parse)
+  (:import-from :clavier
+                :email-validator
+                :validate))
+(in-package :ros.script.github-user-emails.3831548189)
+
+(defun print-error (string)
+  (format *error-output*
+          "~A~%"
+          (concatenate 'string (red "[ERROR] ") string)))
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+
+  (when (null (first argv))
+    (print-error "Github username argument needed!")
+    (format *error-output* "Example: github-user-emails.ros githubusername~%")
+    (uiop:quit 1))
+
+  (let* ((username (first argv))
+         (json-data
+           (handler-case
+               (dexador:get (format nil "https://api.github.com/users/~A/events/public" username))
+             (dexador.error:http-request-not-found (error)
+               (print-error
+                (concatenate 'string
+                             username
+                             " emails cannot be retrieved. Have you checked your internet connection and if the user exist?"))
+               (print-error (format nil "Exception: ~A" error))
+               (uiop:quit 1))))
+         (parsed (parse json-data))
+
+         (payloads (mapcar #'(lambda (e) (gethash "payload" e)) parsed))
+         (commits (mapcar #'(lambda (i)
+                              (gethash "commits" i))
+                          (remove-if-not #'(lambda (e) (gethash "commits" e)) payloads)))
+         (authors (mapcar #'(lambda (e) (gethash "author" (first e))) commits))
+         (emails (remove-duplicates
+                  (mapcar #'(lambda (e) (gethash "email" e)) authors)
+                  :test #'string=)))
+    (let ((validator (make-instance 'email-validator)))
+      (dolist (email emails)
+        (when (validate validator email)
+          (format t "~A~%" email))))))
+
+
+;;; vim: set ft=lisp lisp:
