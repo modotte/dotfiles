@@ -1,0 +1,68 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+
+;;;;  Copyright (c) 2021, Runecroon
+;;;;  All rights reserved.
+;;;;
+;;;;  This source code is licensed under the BSD-style license found in the
+;;;;  LICENSE file in the root directory of this source tree.
+
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(cl-project
+                             cl-ansi-text)
+                           :silent t))
+
+(defpackage :ros.script.cl-project.3831503082
+  (:use :cl)
+  (:import-from :uiop
+                :getenv
+                :probe-file*)
+  (:import-from :cl-project
+                :make-project)
+  (:import-from :cl-ansi-text
+                :red
+                :green))
+(in-package :ros.script.cl-project.3831503082)
+
+(defconstant +home+ (getenv "HOME"))
+
+(defun print-ok (string)
+  (format t
+          "~A~%"
+          (concatenate 'string
+                       (green "[OK] ")
+                       string)))
+(defun print-error (string)
+  (format *error-output*
+          "~A~%"
+          (concatenate 'string
+                       (red "[ERROR] ")
+                       string)))
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (let ((project-name (first argv)))
+
+    (when (null project-name)
+      (print-error "Project name argument needed!")
+      (format *error-output* "Example: cl-project.ros project-name~%")
+      (uiop:quit 1))
+
+    (let ((project-path (format nil
+                                "~A/quicklisp/local-projects/~A"
+                                +home+
+                                project-name)))
+
+
+      (unless (null (probe-file* project-path))
+        (print-error "Project already exist! Exiting with error")
+        (uiop:quit 1))
+
+      (make-project (pathname project-path))
+      (print-ok (format nil "New project is located in: ~A" project-path)))))
+
+;;; vim: set ft=lisp lisp:

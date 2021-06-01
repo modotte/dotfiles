@@ -1,0 +1,188 @@
+(require 'package)
+(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                    (not (gnutls-available-p))))
+       (proto (if no-ssl "http" "https")))
+  (when no-ssl (warn "\
+Your version of Emacs does not support SSL connections,
+which is unsafe because it allows man-in-the-middle attacks.
+There are two things you can do about this warning:
+1. Install an Emacs version that does support SSL and be safe.
+2. Remove this warning from your init file so you won't see it again."))
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+  ;; and `package-pinned-packages`. Most users will not need or want to do this.
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  )
+(package-initialize)
+
+
+;;; ELISP LANGUAGE EXTENSIONS
+
+;; Enable lexical binding.
+(setq lexical-binding t)
+
+;;; ELISP config vars
+
+(setq local-projects-path "~/quicklisp/local-projects")
+
+;; Disable Emacs welcome buffer on startup.
+(setq inhibit-startup-message t)
+
+;; Don't create 'backup' files.
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
+
+;; Set yes or no prompt with answer y/n.
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; Pair parentheses and other characters combination.
+;; Also highlight parentheses.
+(electric-pair-mode)
+(show-paren-mode t)
+(global-whitespace-mode 1)
+
+;; Use spaces instead of tabs.
+(setq-default indent-tabs-mode nil)
+
+;; C/C++
+(setq c-default-style "bsd"
+      c-basic-offset 4)
+
+;; Highlight characters beyond than 80th column
+;; for consistency guideline.
+(setq-default whitespace-line-column
+              80
+              whitespace-style
+              '(face lines-tail))
+
+;; Advance Perl mode
+(defalias 'perl-mode 'cperl-mode)
+
+;; Make line number mode (horizontal)
+;; and column number mode (vertical)
+;; default for every file.
+(global-linum-mode t)
+(column-number-mode t)
+(nyan-mode)
+
+(require 'smex)
+(smex-initialize)
+
+;;; KEY SHORTCUTS
+
+(global-set-key (kbd "C-x u") 'windmove-up)
+(global-set-key (kbd "C-x d") 'windmove-down)
+(global-set-key (kbd "C-x p") 'windmove-left)
+(global-set-key (kbd "C-x n") 'windmove-right)
+(global-set-key (kbd "S-C-p") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-n") 'enlarge-window-horizontally)
+(global-set-key (kbd "S-C-u") 'enlarge-window)
+(global-set-key (kbd "S-C-d") 'shrink-window)
+(global-set-key (kbd "S-C-k") 'kill-buffer-and-window)
+(global-set-key (kbd "S-C-r") 'read-only-mode)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+(add-to-list 'auto-mode-alist
+             '("\\.html?\\'" . web-mode))
+;; This is your old M-x.
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
+(add-hook 'after-init-hook 'global-company-mode)
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+;;(load (expand-file-name "~/.roswell/helper.el"))
+;; Replace "sbcl" with the path to your implementation.
+;;(setq inferior-lisp-program "ros -Q run")
+(setq inferior-lisp-program "sbcl")
+(slime-setup '(slime-fancy slime-company))
+(defun slime-qlot-exec (directory)
+  (interactive (list (read-directory-name "Project directory: ")))
+  (slime-start :program "qlot"
+               :program-args '("exec" "ros" "-S" "." "run")
+               :directory directory
+               :name 'qlot
+               :env (list (concat "PATH=" (mapconcat 'identity exec-path ":")))))
+
+(load-theme 'material t)
+(defun terminal ()
+  (interactive)
+  (split-window-below)
+  (windmove-down)
+  (ansi-term "/bin/bash" "Terminal"))
+
+(defun destroy-terminal ()
+  (interactive)
+  (kill-buffer)
+  (delete-window))
+
+(global-set-key (kbd "C-x t") 'terminal)
+(global-set-key (kbd "C-x C-t") 'destroy-terminal)
+
+;(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+;(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+;(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+;(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+;(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+;(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+;(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+;; Stop SLIME's REPL from grabbing DEL,
+;; which is annoying when backspacing over a '('
+;(defun override-slime-repl-bindings-with-paredit ()
+;  (define-key slime-repl-mode-map
+;    (read-kbd-macro paredit-backward-delete-key) nil))
+                                        ;(add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
+
+;; fontify doc strings in correct face
+;; lisp-mode already fontifies 'defun*' correctly
+(put 'defvar*   'doc-string-elt 3)
+(put 'defparameter*   'doc-string-elt 3)
+(put 'lambda*   'doc-string-elt 2)
+
+(defvar *lisp-special-forms*
+  (regexp-opt '("defvar*"
+                "defconstant*"
+                "defparameter*"
+                "defgeneric*"
+                "defmethod*"
+                "lambda*"
+                "flet*"
+                "labels*") 'words))
+(font-lock-add-keywords 'lisp-mode
+                        `((,*lisp-special-forms* . font-lock-keyword-face)))
+
+(yas-global-mode 1)
+(defun code-compile ()
+  (interactive)
+  (unless (file-exists-p "Makefile")
+    (set (make-local-variable 'compile-command)
+         (let ((file (file-name-nondirectory buffer-file-name)))
+           (format "%s -o %s %s"
+                   (if  (equal (file-name-extension file) "cpp") "g++" "gcc" )
+                   (file-name-sans-extension file)
+                   file)))
+    (compile compile-command)))
+
+(global-set-key [f9] 'code-compile)
+
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'objc-mode-hook 'irony-mode)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(flycheck-irony company-irony irony flycheck-gradle flycheck-cask flycheck yasnippet sublimity diff-hl elpher gemini-mode lfe-mode kotlin-mode fsharp-mode csharp-mode typescript-mode forth-mode cider lsp-haskell paredit geiser mu4e-alert pdf-tools lispy go-mode clang-format qt-pro-mode meson-mode web-mode rustic lsp-mode lua-mode vlf smex slime-company python-mode nyan-mode neotree monokai-theme material-theme magit helm-swoop auto-complete aggressive-indent)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
