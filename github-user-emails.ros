@@ -15,7 +15,8 @@ exec ros -Q -- $0 "$@"
   #+quicklisp(ql:quickload '(cl-ansi-text
                              dexador
                              yason
-                             clavier)
+                             clavier
+                             arrows)
                            :silent t))
 
 (defpackage :ros.script.github-user-emails.3831548189
@@ -26,13 +27,33 @@ exec ros -Q -- $0 "$@"
                 :parse)
   (:import-from :clavier
                 :email-validator
-                :validate))
+                :validate)
+  (:import-from :arrows
+                :->>))
 (in-package :ros.script.github-user-emails.3831548189)
 
 (defun print-error (string)
   (format *error-output*
           "~A~%"
           (concatenate 'string (red "[ERROR] ") string)))
+
+(defun parsed-json (username)
+  (let ((raw-json
+          (handler-case
+              (dexador:get (format nil "https://api.github.com/users/~A/events/public" username))
+            (dexador.error:http-request-not-found (error)
+              (print-error
+               (format nil "~A emails cannot be retrieved. Are you sure if the user exist?" username))
+              (print-error (format nil "Exception: ~A" error))
+              (uiop:quit 1))
+            (usocket:network-unreachable-error (error)
+              (print-error "Cannot connect to Github server. Probably Github is down or you are not connected to the internet?")
+              (print-error (format nil "Exception: ~A" error))
+              (uiop:quit 1))
+            (error (error)
+              (print-error error)
+              (uiop:quit 1)))))
+    (parse raw-json)))
 
 (defun main (&rest argv)
   (declare (ignorable argv))
@@ -43,37 +64,18 @@ exec ros -Q -- $0 "$@"
     (uiop:quit 1))
 
   (let* ((username (first argv))
-         (json-data
-           (handler-case
-               (dexador:get (format nil "https://api.github.com/users/~A/events/public" username))
-             (dexador.error:http-request-not-found (error)
-               (print-error
-                (concatenate 'string
-                             username
-                             " emails cannot be retrieved. Are you sure if the user exist?"))
-               (print-error (format nil "Exception: ~A" error))
-               (uiop:quit 1))
-             (usocket:network-unreachable-error (error)
-               (print-error "Cannot connect to Github server. Probably Github is down or you are not connected to the internet?")
-               (print-error (format nil "Exception: ~A" error))
-               (uiop:quit 1))
-             (error (error)
-               (print-error error)
-               (uiop:quit 1))))
-         (parsed (parse json-data))
+         (validator (make-instance 'email-validator))
+         (emails
+           (->> (parsed-json username)
 
-         (payloads (mapcar #'(lambda (e) (gethash "payload" e)) parsed))
-         (commits (mapcar #'(lambda (i)
-                              (gethash "commits" i))
-                          (remove-if-not #'(lambda (e) (gethash "commits" e)) payloads)))
-         (authors (mapcar #'(lambda (e) (gethash "author" (first e))) commits))
-         (emails (remove-duplicates
-                  (mapcar #'(lambda (e) (gethash "email" e)) authors)
-                  :test #'string=)))
-    (let ((validator (make-instance 'email-validator)))
-      (dolist (email emails)
-        (when (validate validator email)
-          (format t "~A~%" email))))))
+                (mapcar #'(lambda (e) (gethash "payload" e)))
+                (remove-if-not #'(lambda (e) (gethash "commits" e)))
+                (mapcar #'(lambda (e) (gethash "commits" e)))
+                (mapcar #'(lambda (e) (gethash "author" (first e))))
+                (mapcar #'(lambda (e) (gethash "email" e))))))
 
+    (dolist (email (remove-duplicates emails :test #'string=))
+      (when (validate validator email)
+        (format t "~A~%" email)))))
 
 ;;; vim: set ft=lisp lisp:
