@@ -41,14 +41,12 @@ exec ros -Q -- $0 "$@"
   (let ((raw-json
           (handler-case
               (dexador:get (format nil "https://api.github.com/users/~A/events/public" username))
-            (dexador.error:http-request-not-found (error)
+            (dexador.error:http-request-not-found ()
               (print-error
                (format nil "~A emails cannot be retrieved. Are you sure if the user exist?" username))
-              (print-error (format nil "Exception: ~A" error))
               (uiop:quit 1))
-            (usocket:network-unreachable-error (error)
+            (usocket:network-unreachable-error ()
               (print-error "Cannot connect to Github server. Probably Github is down or you are not connected to the internet?")
-              (print-error (format nil "Exception: ~A" error))
               (uiop:quit 1))
             (error (error)
               (print-error error)
