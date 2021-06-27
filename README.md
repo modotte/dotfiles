@@ -27,6 +27,11 @@ Simply run `sh script.sh`
   - Get a list of a user's (and associated) public emails.
   - Usage: `github-user-emails.ros GITHUB_USERNAME`
   - Example: `github-user-emails.ros torvalds`
+  
+- reposbackup.py
+  - Clone all repositories from user (required personal access token as argument)
+  - Usage: `reposbackup.py GITHUB_PERSONAL_ACCESS_TOKEN_KEY`
+  - This will create **reposbackup.tar.xz** once it is done.
 
 ## License
 This project is licensed under the BSD-3-Clause license. See LICENSE file for details.
