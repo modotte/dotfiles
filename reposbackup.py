@@ -19,12 +19,8 @@ for repository in github.get_user().get_repos():
     subprocess.run(["git", "clone", link])
 
     shutil.move(repository.name, "reposbackup")
-    
+
 print("Creating tarball")
 shutil._make_tarball("reposbackup", "reposbackup", compress="xz")
 print("Done")
 
-
-
-if __name__ == '__main__':
-    pass
