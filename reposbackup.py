@@ -7,7 +7,8 @@ import sys
 try:
     github = Github(sys.argv[1])
 except IndexError:
-    print("need Github personal access token key as first argument", file=sys.stderr)
+    print("need Github personal access token key as first argument",
+          file=sys.stderr)
     sys.exit(1)
 
 username = github.get_user().login
@@ -28,4 +29,3 @@ for repository in github.get_user().get_repos():
 print("creating tarball..")
 shutil._make_tarball(dirname, dirname, compress="xz")
 print("done")
-
