@@ -4,23 +4,28 @@ import subprocess
 import shutil
 import sys
 
-github = Github(sys.argv[1])
-username = github.get_user().login
+try:
+    github = Github(sys.argv[1])
+except IndexError:
+    print("need Github personal access token key as first argument", file=sys.stderr)
+    sys.exit(1)
 
-# So you won't need to insert SSH key for every clone.
+username = github.get_user().login
+dirname = "reposbackup"
+
+# So you won't need to insert SSH key for every cloning process.
 subprocess.run(["ssh-add"])
 
-os.mkdir("reposbackup")
+os.mkdir(dirname)
 
-print("Cloning online repositories..")
+print("cloning online repositories..")
 for repository in github.get_user().get_repos():
     link = "git@github.com:{}/{}".format(username, repository.name)
     print(link)
     subprocess.run(["git", "clone", link])
+    shutil.move(repository.name, dirname)
 
-    shutil.move(repository.name, "reposbackup")
-
-print("Creating tarball")
-shutil._make_tarball("reposbackup", "reposbackup", compress="xz")
-print("Done")
+print("creating tarball..")
+shutil._make_tarball(dirname, dirname, compress="xz")
+print("done")
 
