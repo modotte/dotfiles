@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+# Make a tarball of owned Github repositories.
+
 from github import Github
 import os
 import subprocess
