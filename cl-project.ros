@@ -4,7 +4,7 @@
 exec ros -Q -- $0 "$@"
 |#
 
-;;;;  Copyright (c) 2021, Runecroon
+;;;;  Copyright (c) 2021, Hellcatto
 ;;;;  All rights reserved.
 ;;;;
 ;;;;  This source code is licensed under the BSD-style license found in the

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2021, Runecroon
+# Copyright (C) 2021, Hellcatto
 # Version: 0.1.2
 # Description: Automatically build a basic dynamic snapshot-based,
 # disk image and to launch the operating system on the QEMU VM.
