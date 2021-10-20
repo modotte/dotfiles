@@ -7,7 +7,7 @@
 (message "EMACS INIT ROOT: %s" emacs-root)
 (message "")
 
-(find-file "./setup.txt")
+(find-file "./setup.el")
 (write-file emacs-root)
 (kill-buffer)
 
@@ -44,6 +44,7 @@
         meson-mode ; meson build system
 	lsp ; Language Server Protocol
 	csharp-mode ; C#
+	csproj-mode
 	eglot-fsharp ; F#
 	json-mode
 	yaml-mode
@@ -54,7 +55,7 @@
   (message "Installing %s" i)
   (package-install i))
 
-(find-file "./setup2.txt")
+(find-file "./setup2.el")
 (write-file emacs-root)
 (kill-buffer)
 
