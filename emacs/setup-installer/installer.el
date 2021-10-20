@@ -34,20 +34,19 @@
         nyan-mode ; who doesn't love nyan cat for file position indicator
         neotree ; simple and working project tree view
         python-mode ; why not?
-        slime ; common lisp REPL on steroid
-        slime-company ; cool autocomplete for SLIME
-        aggressive-indent ; make indentation automatic, forcefully
+	sly ; Common Lisp's SLIME on steroid
         company ; is here if I want to use for alternative auto-complete
         vlf ; for opening extremely huge file without failing
         helm-swoop ; simple project-wide search-and-replace
         magit ; useful interactivity with git
         monokai-theme ; good ol rad theme
-        material-theme ; new ish theme
-        auto-complete ; cool autocomplete
         web-mode ; awesome HTML5 mode
         meson-mode ; meson build system
-        clang-format ; C/C++ auto-formatting (recommends webkit style)
-        lua-mode ; for Lua lang syntax highlighting
+	lsp ; Language Server Protocol
+	csharp-mode ; C#
+	eglot-fsharp ; F#
+	json-mode
+	yaml-mode
 ))
 
 (dolist (i package-list)
