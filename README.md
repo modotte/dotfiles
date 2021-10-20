@@ -12,9 +12,15 @@ The Common Lisp scripts (ended with `.ros` extension) could be invoked with:
 - `ros exec script.ros`
 - For faster startup time, you can build the script into (using sbcl) fast execution speed, native machine executable:
   - `ros build script.ros` and to run `./script`
+  
+### Emacs scripts
+Follow instructions in the README of the subdirectory.
 
-### POSIX Bourne shell scripts (.sh)
-Simply run `sh script.sh`
+### Shell scripts
+Simply run `bash script.sh`
+
+### Python 3+ scripts
+Run `python3 script.py`. If it complains about missing module, install it with `pip install module`
 
 ## Scripts General Purpose
 
@@ -22,11 +28,6 @@ Simply run `sh script.sh`
   - Creates a Common Lisp project skeleton automatically.
   - Usage: `cl-project.ros PROJECT_NAME [LOCAL_PROJECTS_ROOT_DIRECTORY]`
   - Example: `cl-project.ros meow # By default, creates $HOME/.roswell/local-projects/meow`
-  
-- github-user-emails.ros
-  - Get a list of a user's (and associated) public emails.
-  - Usage: `github-user-emails.ros GITHUB_USERNAME`
-  - Example: `github-user-emails.ros torvalds`
   
 - reposbackup.py
   - Clone all repositories from user (required personal access token as argument)
