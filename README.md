@@ -22,7 +22,7 @@ Simply run `bash script.sh`
 ### Python 3+ scripts
 Run `python3 script.py`. If it complains about missing module, install it with `pip install module`
 
-## Scripts General Purpose
+## Scripts Overview
 
 - cl-project.ros
   - Creates a Common Lisp project skeleton automatically.
