@@ -2,7 +2,7 @@
 My Unix-like systems automation scripts.
 It's meant to be used on various Linux distributions and FreeBSD/OpenBSD/NetBSD.
 Anyway, I mostly use these scripts for my personal use only, but if you find
-some of these scripts been helpful to you, please consider to *star* this repository.
+some of these scripts been helpful to you, let me know by leaving a star on this repository.
 
 
 ## Usage
